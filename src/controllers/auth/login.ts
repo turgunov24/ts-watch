@@ -27,7 +27,7 @@ export default async (req: Request, res: Response) => {
 			return res.status(400).json({ message: 'Invalid password' })
 		}
 
-		const token = generateToken({ username: finded.username, id: finded.id })
+		const token = generateToken({ username: finded.dataValues.username, password: finded.dataValues.password })
 
 		res.json({ token, user: finded })
 	} catch (error: unknown) {

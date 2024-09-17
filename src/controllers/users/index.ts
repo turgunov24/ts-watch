@@ -1,6 +1,8 @@
 import { hashPassword } from "../../utils/bcrypt";
+import { generateToken } from "../../utils/jwt";
 import { Request, Response } from "express";
 import Users from "../../models/users";
+import { pick } from "lodash";
 
 const index = async (req: Request, res: Response) => {
   try {
@@ -23,14 +25,22 @@ const create = async (req: Request, res: Response) => {
 
     const hashedPassword = await hashPassword(password);
 
+    const token = generateToken({
+      username,
+      password,
+    });
+
     const user = await Users.create({
       username,
       password: hashedPassword,
       status: 1,
-      token: "something",
+      token,
     });
 
-    res.json({ message: "User succesfully created", user });
+    res.json({
+      message: "User succesfully created",
+      user: pick(user.toJSON(), ["username", "status", "token"]),
+    });
   } catch (error: unknown) {
     res.status(500).json({ message: "Internal server error" });
   }
@@ -46,7 +56,7 @@ const get = async (req: Request, res: Response) => {
 
     if (!user) return res.status(400).json({ message: "User not found" });
 
-    res.json(user);
+    res.json(pick(user.toJSON(), ["username", "status", "id"]));
   } catch (error: unknown) {
     res.status(500).json({ message: "Internal server error" });
   }
