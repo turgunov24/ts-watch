@@ -1,6 +1,7 @@
 // src/models/User.ts
-import { DataTypes, ModelDefined, Optional } from "sequelize";
-import { sequelize } from "../../../../config/db";
+import { Optional, DataTypes, ModelDefined } from 'sequelize'
+
+import { sequelize } from '../../../../config/db'
 
 enum ITypes {
   country = 1,
@@ -8,41 +9,58 @@ enum ITypes {
   district = 3,
 }
 
-interface ReferenceMainAttributes {
-  id: number;
-  name: string;
-  type: ITypes;
+interface ReferenceMainDistrictAttributes {
+  regionId?: number
+}
+interface ReferenceMainRegionAttiributes {
+  countryId?: number
+}
+
+interface ReferenceMainAttributes
+  extends ReferenceMainDistrictAttributes,
+    ReferenceMainRegionAttiributes {
+  id: number
+  name: string
+  type: ITypes
 }
 
 interface ReferenceMainCreationAttributes
-  extends Optional<ReferenceMainAttributes, "id"> {}
+  extends Optional<ReferenceMainAttributes, 'countryId' | 'regionId' | 'id'> {}
 
 const ReferenceMain: ModelDefined<
   ReferenceMainAttributes,
   ReferenceMainCreationAttributes
 > = sequelize.define(
-  "ReferenceMain",
+  'ReferenceMain',
   {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
     name: {
-      type: DataTypes.STRING,
       allowNull: false,
+      type: DataTypes.STRING,
     },
     type: {
-      type: DataTypes.INTEGER,
       allowNull: false,
+      type: DataTypes.STRING,
+    },
+    regionId: {
+      allowNull: true,
+      type: DataTypes.INTEGER,
+    },
+    countryId: {
+      allowNull: true,
+      type: DataTypes.INTEGER,
+    },
+    id: {
+      primaryKey: true,
+      autoIncrement: true,
+      type: DataTypes.INTEGER,
     },
   },
   {
-    tableName: "ReferenceMain",
     timestamps: true,
+    tableName: 'ReferenceMain',
   }
-);
+)
 
-ReferenceMain.sync();
+ReferenceMain.sync({ alter: true })
 
-export default ReferenceMain;
+export default ReferenceMain

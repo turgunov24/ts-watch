@@ -1,46 +1,47 @@
-import { DataTypes, ModelDefined, Optional } from "sequelize";
-import { sequelize } from "../../config/db";
+import { Optional, DataTypes, ModelDefined } from 'sequelize'
+
+import { sequelize } from '../../config/db'
 
 interface UserAttributes {
-  id?: number;
-  username: string;
-  password: string;
-  token: string;
-  status: number;
+  id: number
+  token: string
+  status: number
+  username: string
+  password: string
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, "id"> {}
-
-const Users: ModelDefined<UserAttributes, UserCreationAttributes> =
-  sequelize.define(
-    "Users",
-    {
-      id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      username: {
-        allowNull: false,
-        type: DataTypes.STRING,
-      },
-      password: {
-        allowNull: false,
-        type: DataTypes.STRING,
-      },
-      token: {
-        type: DataTypes.STRING,
-      },
-      status: {
-        type: DataTypes.INTEGER,
-      },
+const Users: ModelDefined<
+  UserAttributes,
+  Optional<UserAttributes, 'id'>
+> = sequelize.define(
+  'Users',
+  {
+    token: {
+      type: DataTypes.STRING,
     },
-    {
-      tableName: "Users",
-      timestamps: true,
-    }
-  );
+    status: {
+      type: DataTypes.INTEGER,
+    },
+    username: {
+      allowNull: false,
+      type: DataTypes.STRING,
+    },
+    password: {
+      allowNull: false,
+      type: DataTypes.STRING,
+    },
+    id: {
+      primaryKey: true,
+      autoIncrement: true,
+      type: DataTypes.INTEGER,
+    },
+  },
+  {
+    timestamps: true,
+    tableName: 'Users',
+  }
+)
 
-Users.sync();
+Users.sync()
 
-export default Users;
+export default Users

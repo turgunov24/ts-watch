@@ -1,12 +1,14 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"module": "NodeNext",
-		"outDir": "./dist",
-		"rootDir": "./",
-		"strict": true,
-		"esModuleInterop": true
-	},
-	"include": ["./**/*", "config"],
-	"exclude": ["node_modules", "**/*.test.ts"] // Exclude
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "outDir": "./dist",
+    "rootDir": "./",
+    "strict": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  },
+  "include": ["./**/*"],
+  "exclude": ["node_modules", "**/*.test.ts"] // Exclude
 }

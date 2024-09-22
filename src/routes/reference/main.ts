@@ -1,11 +1,12 @@
-import { create, get, update, remove } from "../../controllers/reference/main";
-import express from "express";
+import { create, get, update, remove } from '../../controllers/reference/main'
+import { authenticateToken } from '../../middlewares/authentificateToken'
+import express from 'express'
 
-const router = express.Router();
+const router = express.Router()
 
-router.get("/reference-main", get);
-router.post("/reference-main", create);
-router.put("/reference-main", update);
-router.delete("/reference-main", remove);
+router.get('/reference-main', get)
+router.post('/reference-main', create)
+router.put('/reference-main', update)
+router.delete('/reference-main', remove)
 
-export default router;
+export default router
