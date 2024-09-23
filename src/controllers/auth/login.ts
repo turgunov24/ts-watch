@@ -8,12 +8,6 @@ export default async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body
 
-    if (!username || !password) {
-      return res
-        .status(400)
-        .json({ message: 'Username and password are required' })
-    }
-
     const finded = await Users.findOne({
       where: { username },
     })
@@ -37,7 +31,7 @@ export default async (req: Request, res: Response) => {
     })
 
     res.json({ token, user: finded })
-  } catch (error: unknown) {
+  } catch {
     res.status(500).json({ message: 'Internal server error' })
   }
 }

@@ -5,11 +5,21 @@ import { usersService } from '../../services/users.service'
 import { hashPassword } from '../../utils/bcrypt'
 import { generateToken } from '../../utils/jwt'
 
-const index = async (req: Request, res: Response) => {
+const get = async (req: Request, res: Response) => {
   try {
-    const users = await usersService.index()
-    res.json({ users })
-  } catch {
+    const { id } = req.query
+
+    if (id) {
+      const user = await usersService.get(id as string)
+      res.json(pick(user.toJSON(), ['username', 'status', 'id']))
+    } else {
+      const users = await usersService.index()
+      res.json({ users })
+    }
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return res.status(400).json({ message: error.message })
+
     res.status(500).json({ message: 'Internal server error' })
   }
 }
@@ -17,12 +27,6 @@ const index = async (req: Request, res: Response) => {
 const create = async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body
-
-    if (!username || !password) {
-      return res
-        .status(400)
-        .json({ message: 'Username and password are required' })
-    }
 
     const hashedPassword = await hashPassword(password)
 
@@ -37,7 +41,7 @@ const create = async (req: Request, res: Response) => {
       password: hashedPassword,
     })
 
-    res.json({
+    res.status(201).json({
       message: 'User succesfully created',
       user: pick(user.toJSON(), ['username', 'status', 'token']),
     })
@@ -46,49 +50,33 @@ const create = async (req: Request, res: Response) => {
   }
 }
 
-const get = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params
-
-    const user = await usersService.get(id)
-
-    res.json(pick(user.toJSON(), ['username', 'status', 'id']))
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return res.status(400).json({ message: error.message })
-    }
-    res.status(500).json({ message: 'Internal server error' })
-  }
-}
-
 const update = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params
+    const { id } = req.query
 
-    const user = await usersService.update(id, req.body)
+    const user = await usersService.update(id as string, req.body)
 
     res.json(user)
   } catch (error: unknown) {
-    if (error instanceof Error) {
+    if (error instanceof Error)
       return res.status(400).json({ message: error.message })
-    }
+
     res.status(500).json({ message: 'Internal server error' })
   }
 }
 
 const remove = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params
+    const { id } = req.query
 
-    await usersService.remove(id)
+    await usersService.remove(id as string)
     res.json({ message: 'User deleted' })
   } catch (error: unknown) {
-    console.log('error', error)
-    if (error instanceof Error) {
+    if (error instanceof Error)
       return res.status(400).json({ message: error.message })
-    }
+
     res.status(500).json({ message: 'Internal server error' })
   }
 }
 
-export { get, index, create, remove, update }
+export { get, create, remove, update }
