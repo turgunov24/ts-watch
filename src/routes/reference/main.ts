@@ -1,12 +1,21 @@
-import { create, get, update, remove } from '../../controllers/reference/main'
-import { authenticateToken } from '../../middlewares/authentificateToken'
+import { validate } from 'express-validation'
 import express from 'express'
+
+import validation from '../../controllers/reference/main/validation'
+import { get, create } from '../../controllers/reference/main'
 
 const router = express.Router()
 
-router.get('/reference-main', get)
-router.post('/reference-main', create)
-router.put('/reference-main', update)
-router.delete('/reference-main', remove)
+router.get(
+  '/reference-main',
+  validate(validation.get, { keyByField: true }),
+  get
+)
+router.post(
+  '/reference-main',
+  // validate(validation.create, { keyByField: true }),
+  validation.createValidation,
+  create
+)
 
 export default router

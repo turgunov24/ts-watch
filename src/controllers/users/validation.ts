@@ -9,7 +9,7 @@ const create = {
 
 const update = {
   query: Joi.object({
-    id: Joi.string().required(),
+    id: Joi.string().required(),	
   }).options({ abortEarly: false }),
   body: Joi.object({
     username: Joi.string().required(),

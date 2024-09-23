@@ -2,18 +2,13 @@
 import { Optional, DataTypes, ModelDefined } from 'sequelize'
 
 import { sequelize } from '../../../../config/db'
-
-enum ITypes {
-  country = 1,
-  region = 2,
-  district = 3,
-}
+import { ITypes } from './types'
 
 interface ReferenceMainDistrictAttributes {
-  regionId?: number
+  regionId: number
 }
 interface ReferenceMainRegionAttiributes {
-  countryId?: number
+  countryId: number
 }
 
 interface ReferenceMainAttributes
@@ -24,12 +19,9 @@ interface ReferenceMainAttributes
   type: ITypes
 }
 
-interface ReferenceMainCreationAttributes
-  extends Optional<ReferenceMainAttributes, 'countryId' | 'regionId' | 'id'> {}
-
 const ReferenceMain: ModelDefined<
   ReferenceMainAttributes,
-  ReferenceMainCreationAttributes
+  Optional<ReferenceMainAttributes, 'countryId' | 'regionId' | 'id'>
 > = sequelize.define(
   'ReferenceMain',
   {

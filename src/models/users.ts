@@ -42,6 +42,6 @@ const Users: ModelDefined<
   }
 )
 
-Users.sync()
+Users.sync({ alter: true })
 
 export default Users

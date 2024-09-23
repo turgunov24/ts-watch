@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-catch */
 import Users from '../models/users'
 
 export const usersService = {
