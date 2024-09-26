@@ -1,35 +1,21 @@
 import { DatabaseError } from 'sequelize'
 
-import ReferenceMain from '../models/reference/main'
+import ReferencesRegions from '../../models/reference/regions'
 
-export const referenceMainService = {
-  index: async (type: string) => {
+export const referencesRegionsService = {
+  index: async () => {
     try {
-      const references = await ReferenceMain.findAll({ where: { type } })
+      const references = await ReferencesRegions.findAll()
       return references
     } catch (error: unknown) {
       if (error instanceof DatabaseError) throw new Error(error.message)
       throw error
     }
   },
-  get: async (id: string) => {
+  create: async (data: any) => {
     try {
-      const user = await ReferenceMain.findByPk(id)
-
-      if (!user) {
-        throw new Error('User not found')
-      }
-
-      return user
-    } catch (error: unknown) {
-      if (error instanceof DatabaseError) throw new Error(error.message)
-      throw error
-    }
-  },
-  create: async (type: string, data: any) => {
-    try {
-      const user = await ReferenceMain.create({ ...data, type })
-      return user
+      const country = await ReferencesRegions.create(data)
+      return country
     } catch (error: unknown) {
       if (error instanceof DatabaseError) throw new Error(error.message)
       throw error
@@ -37,10 +23,10 @@ export const referenceMainService = {
   },
   update: async (id: string, data: any) => {
     try {
-      const user = await ReferenceMain.findByPk(id)
+      const user = await ReferencesRegions.findByPk(id)
 
       if (!user) {
-        throw new Error('user not found')
+        throw new Error('Regions not found')
       }
       await user.update(data)
 
@@ -50,11 +36,25 @@ export const referenceMainService = {
       throw error
     }
   },
+  get: async (id: string) => {
+    try {
+      const user = await ReferencesRegions.findByPk(id)
+
+      if (!user) {
+        throw new Error('Region not found')
+      }
+
+      return user
+    } catch (error: unknown) {
+      if (error instanceof DatabaseError) throw new Error(error.message)
+      throw error
+    }
+  },
   remove: async (id: string) => {
     try {
-      const user = await ReferenceMain.findByPk(id)
+      const user = await ReferencesRegions.findByPk(id)
       if (!user) {
-        throw new Error('user not found')
+        throw new Error('Region not found')
       }
       await user.destroy()
     } catch (error: unknown) {

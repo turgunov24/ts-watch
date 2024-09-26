@@ -4,6 +4,7 @@ import 'dotenv/config'
 
 import { connect } from '../config/db'
 import routes from './routes'
+import './models/relations'
 
 const app = express()
 const port = 3000

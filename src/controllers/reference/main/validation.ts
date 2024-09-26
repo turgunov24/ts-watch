@@ -1,53 +1,117 @@
-import { check, query } from 'express-validator'
-import { Joi } from 'express-validation'
+import { body, query } from 'express-validator'
+import { Request } from 'express'
 
 import { ITypes } from '../../../models/reference/main/types'
 
-const get = {
-  query: Joi.object({
-    id: Joi.number().optional(),
-    type: Joi.number()
-      .valid(...Object.values(ITypes))
-      .optional(),
-  })
-    .xor('id', 'type')
-    .options({ abortEarly: false }),
-}
+export const get = [
+  query().custom((value: Request['query']) => {
+    const { id, type } = value
 
-const create = {
-  query: Joi.object({
-    type: Joi.number()
-      .valid(...Object.values(ITypes))
-      .required(),
-  }),
-  body: Joi.object({
-    regionId: Joi.number().when('query.type', {
-      is: Joi.valid(3),
-      then: Joi.required(),
-      otherwise: Joi.optional(),
-    }),
-  }),
-}
+    if (!id && !type) {
+      throw new Error('Either "id" or "type" must be provided')
+    }
 
-const createValidation = [
+    if (id && type) {
+      throw new Error('Only one of "id" or "type" must be provided')
+    }
+
+    return true
+  }),
+  query('id').optional().isNumeric().withMessage('id must be a number'),
+
+  query('type')
+    .optional()
+    .isNumeric()
+    .withMessage('Type must be a number')
+    .custom((value) => Object.values(ITypes).includes(Number(value)))
+    .withMessage('Invalid type'),
+]
+
+const create = [
   query('type')
     .notEmpty()
     .withMessage('Type is required')
-    .bail() // Stop validation chain if empty
+    .bail()
     .isNumeric()
     .withMessage('Type must be a number')
-    .bail() // Stop validation if not a number
-    .custom((value) => Object.values(ITypes).includes(Number(value)))
+    .bail()
+    .custom((value) => {
+      const numValue = Number(value)
+      return Object.values(ITypes).includes(numValue)
+    })
     .withMessage('Invalid type'),
-
-  // Conditionally validate the body parameter 'regionId' based on query 'type'
-  check('regionId')
-    .if(query('type').equals('3')) // Check if 'type' equals 3
+  body('name')
     .notEmpty()
-    .withMessage('regionId is required when type is 3')
+    .withMessage('name is required')
+    .bail()
+    .isString()
+    .withMessage('name must be a string')
+    .bail(),
+  body('countryId')
+    .if(query('type').isIn([ITypes.region, ITypes.district]))
+    .notEmpty()
+    .withMessage('countryId is required')
+    .bail()
+    .isNumeric()
+    .withMessage('countryId must be a number'),
+  body('regionId')
+    .if(query('type').equals(String(ITypes.district)))
+    .notEmpty()
+    .withMessage('regionId is required')
     .bail()
     .isNumeric()
     .withMessage('regionId must be a number'),
 ]
 
-export default { get, create, createValidation }
+const update = [
+  query('id')
+    .notEmpty()
+    .withMessage('id is required')
+    .bail()
+    .isNumeric()
+    .withMessage('id must be a number')
+    .bail(),
+  query('type')
+    .notEmpty()
+    .withMessage('Type is required')
+    .bail()
+    .isNumeric()
+    .withMessage('Type must be a number')
+    .bail()
+    .custom((value) => Object.values(ITypes).includes(Number(value)))
+    .withMessage('Invalid type')
+    .bail(),
+  body('name')
+    .notEmpty()
+    .withMessage('name is required')
+    .bail()
+    .isString()
+    .withMessage('name must be a string')
+    .bail(),
+  body('countryId')
+    .if(query('type').isIn([ITypes.region, ITypes.district]))
+    .notEmpty()
+    .withMessage('countryId is required')
+    .bail()
+    .isNumeric()
+    .withMessage('countryId must be a number')
+    .bail(),
+  body('regionId')
+    .if(query('type').equals(String(ITypes.district)))
+    .notEmpty()
+    .withMessage('regionId is required')
+    .bail()
+    .isNumeric()
+    .withMessage('regionId must be a number'),
+]
+
+const remove = [
+  query('id')
+    .notEmpty()
+    .withMessage('id is required')
+    .bail()
+    .isNumeric()
+    .withMessage('id must be a number'),
+]
+
+export default { get, create, update, remove }

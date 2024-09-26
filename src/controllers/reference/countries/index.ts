@@ -1,21 +1,17 @@
 import { Request, Response } from 'express'
-import { pick } from 'lodash'
 
-import { referenceMainService } from '../../../services/referenceMain.service'
+import { referenceCountriesService } from '../../../services/reference/countries.service'
 
 const get = async (req: Request, res: Response) => {
   try {
-    const { id, type } = req.query
+    const { id } = req.query
 
-    if (type) {
-      const references = await referenceMainService.index(type as string)
-      console.log('references', references)
-      return res.json({ references })
-    } else {
-      const reference = await referenceMainService.get(id as string)
-
-      return res.json(reference.toJSON())
+    if (id) {
+      const country = await referenceCountriesService.get(id as string)
+      return res.json(country.toJSON())
     }
+    const countries = await referenceCountriesService.index()
+    res.json({ data: countries })
   } catch (error: unknown) {
     if (error instanceof Error)
       return res.status(400).json({ message: error.message })
@@ -26,16 +22,11 @@ const get = async (req: Request, res: Response) => {
 
 const create = async (req: Request, res: Response) => {
   try {
-    const { type } = req.query
-
-    const reference = await referenceMainService.create(
-      type as string,
-      req.body
-    )
+    const country = await referenceCountriesService.create(req.body)
 
     res.status(201).json({
-      message: 'reference succesfully created',
-      reference: pick(reference.toJSON(), ['id', 'name']),
+      reference: country.toJSON(),
+      message: 'country succesfully created',
     })
   } catch (error: unknown) {
     if (error instanceof Error)
@@ -48,9 +39,12 @@ const update = async (req: Request, res: Response) => {
   try {
     const { id } = req.query
 
-    const reference = await referenceMainService.update(id as string, req.body)
+    const country = await referenceCountriesService.update(
+      id as string,
+      req.body
+    )
 
-    res.json({ message: 'Reference updated', reference: reference.toJSON() })
+    res.json({ message: 'country updated', reference: country.toJSON() })
   } catch (error: unknown) {
     if (error instanceof Error)
       return res.status(400).json({ message: error.message })
@@ -63,9 +57,9 @@ const remove = async (req: Request, res: Response) => {
   try {
     const { id } = req.query
 
-    await referenceMainService.remove(id as string)
+    await referenceCountriesService.remove(id as string)
 
-    res.json({ message: 'Reference deleted' })
+    res.json({ message: 'country deleted' })
   } catch (error: unknown) {
     if (error instanceof Error)
       return res.status(400).json({ message: error.message })

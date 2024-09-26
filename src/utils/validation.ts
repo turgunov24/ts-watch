@@ -1,31 +1,20 @@
-import { Request, Response, NextFunction } from 'express'
-import Joi from '@hapi/joi'
+import { Request, Response, NextFunction, RequestHandler } from 'express'
+import { validationResult } from 'express-validator'
+import { isArray } from 'lodash'
 
-function validateBody(schema: Joi.ObjectSchema) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const { error } = schema.validate(req.body)
+type IvalidationSchema = RequestHandler
 
-    if (error) {
-      return res.status(400).json({
-        message: error.details.map((detail) => detail.message).join(', '),
-      })
-    }
-
-    next()
-  }
+export const validationMiddleware = (
+  validations: IvalidationSchema[] | IvalidationSchema
+): RequestHandler[] => {
+  return [
+    ...(isArray(validations) ? validations : [validations]),
+    (req: Request, res: Response, next: NextFunction) => {
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() })
+      }
+      next()
+    },
+  ]
 }
-function validateParams(schema: Joi.ObjectSchema) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const { error } = schema.validate(req.params)
-
-    if (error) {
-      return res.status(400).json({
-        message: error.details.map((detail) => detail.message).join(', '),
-      })
-    }
-
-    next()
-  }
-}
-
-export { validateBody }
